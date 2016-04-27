@@ -1,6 +1,10 @@
 import numpy as np
 import matplotlib.pyplot as plt
-import pandas
+import pandas, sys, os, math
+from PIL import Image
+from random import randint
+
+
 
 #1.1a
 data = np.loadtxt(open("expDat.txt","r"),delimiter=",",skiprows=1,usecols=range(1,21))
@@ -28,7 +32,7 @@ def ComputeCenteredMatrix( matrix ):
 def ComputeCovarianceMatrix( matrix ):
    centered_matrix = ComputeCenteredMatrix( matrix )
    scale = 1.0/len(matrix)
-   
+
    return scale * np.dot( np.transpose(centered_matrix), centered_matrix )
 
 our_covariance_matrix = ComputeCovarianceMatrix( data )
@@ -87,3 +91,43 @@ for i in range(0, 12, 1):
 plt.plot(np.array(range(0,12))*np.pi/12, variances)
 plt.savefig("1.2d.png")
 plt.close()
+
+
+#1.3
+# a,b)
+img = Image.open("natIMG.jpg")
+imgAry = np.array(img)
+h,w = imgAry.shape
+
+fig = plt.figure()
+fig.suptitle('Img plot')
+
+imgplot = plt.imshow(img)
+imgplot.set_cmap('gray')
+
+# c,d)
+numPatches   = 100
+img_height, img_width = imgAry.shape
+patch_height = 10
+patch_width  = 10
+
+p_per_row = int(math.sqrt(numPatches))
+
+fig = plt.figure()
+fig.suptitle('100 random 10x10 patches plotted as heatmaps')
+
+for i in range(1, numPatches+1):
+    ax = fig.add_subplot(p_per_row, p_per_row, i)
+
+    y = randint(0, img_height - patch_height - 1)
+    x = randint(0, img_width - patch_width - 1)
+
+    roi = imgAry[y:y+patch_height, x:x+patch_width]
+
+    ax.pcolormesh(roi, cmap=plt.cm.Greys)
+    ax.invert_yaxis()
+    ax.xaxis.tick_top()
+    ax.get_yaxis().set_visible(False)
+    ax.get_xaxis().set_visible(False)
+
+plt.show()
